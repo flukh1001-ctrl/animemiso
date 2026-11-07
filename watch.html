@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>รับชมอนิเมะ - ANIMEMISO</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .glow-box {
+      box-shadow: 0 0 20px rgba(168, 85, 247, 0.15);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+    }
+    .glass-effect {
+      background: rgba(20, 20, 25, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+  </style>
+</head>
+<body class="bg-[#0b0b0e] text-gray-100 min-h-screen pb-20 relative overflow-x-hidden font-sans">
+
+  <!-- แถบด้านบน (Header & Back Button) -->
+  <header class="glass-effect sticky top-0 z-30 border-b border-gray-800/80 px-4 py-3.5 flex items-center justify-between max-w-md mx-auto">
+    <button onclick="goBack()" class="flex items-center space-x-2 text-purple-400 hover:text-purple-300 font-semibold text-xs transition">
+      <i class="fa-solid fa-arrow-left text-sm"></i>
+      <span>กลับหน้าหลัก</span>
+    </button>
+    <h1 class="text-xs font-bold text-gray-200 tracking-wider">ANIMEMISO PLAYER</h1>
+    <div class="w-6"></div>
+  </header>
+
+  <!-- ส่วนแสดงผลหลักตอนดูอนิเมะ -->
+  <main class="max-w-md mx-auto p-4 space-y-4">
+    
+    <!-- กรอบวิดีโอ Player (Iframe / Video Stream) -->
+    <div class="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border border-purple-500/30 glow-box shadow-2xl flex items-center justify-center">
+      <!-- สามารถเปลี่ยนลิงก์ src เป็นลิงก์สตรีมมิ่งหรือ Iframe ของตอนนั้นๆ ได้ -->
+      <iframe id="videoPlayer" src="" class="w-full h-full border-0" allowfullscreen></iframe>
+    </div>
+
+    <!-- ข้อมูลเรื่องและชื่อตอนปัจจุบัน -->
+    <div class="glass-effect p-4 rounded-2xl border border-gray-800/80 space-y-2 shadow-lg">
+      <div class="flex items-center justify-between">
+        <span id="animeBadge" class="text-[10px] px-2.5 py-1 rounded-lg font-bold shadow bg-purple-600 text-white">กำลังโหลด...</span>
+        <span id="animeSubTitle" class="text-[11px] text-gray-400">Loading...</span>
+      </div>
+      <h2 id="animeTitle" class="text-sm font-bold text-gray-100 leading-snug">กำลังโหลดข้อมูลอนิเมะ...</h2>
+    </div>
+
+    <!-- รายการเลือกตอน (Episode Selector) -->
+    <div class="glass-effect p-4 rounded-2xl border border-gray-800/80 space-y-3 shadow-lg">
+      <h3 class="text-xs font-bold text-purple-300 flex items-center space-x-2">
+        <i class="fa-solid fa-list-ul"></i>
+        <span>เลือกตอนรับชม</span>
+      </h3>
+      
+      <!-- ปุ่มเลือกตอนตัวอย่าง (สามารถเพิ่มปุ่มตอนอื่นๆ ได้ที่นี่) -->
+      <div id="episodeList" class="grid grid-cols-4 gap-2">
+        <button onclick="changeEpisode('ตอนที่ 1', 'https://www.youtube.com/embed/dQw4w9WgXcQ')" class="bg-purple-600/30 border border-purple-500/50 hover:bg-purple-600 text-purple-200 hover:text-white text-xs font-bold py-2.5 rounded-xl transition shadow">ตอน 1</button>
+        <button onclick="changeEpisode('ตอนที่ 2', 'https://www.youtube.com/embed/dQw4w9WgXcQ')" class="bg-gray-900 border border-gray-800 hover:bg-gray-800 text-gray-300 text-xs font-bold py-2.5 rounded-xl transition">ตอน 2</button>
+        <button onclick="changeEpisode('ตอนที่ 3', 'https://www.youtube.com/embed/dQw4w9WgXcQ')" class="bg-gray-900 border border-gray-800 hover:bg-gray-800 text-gray-300 text-xs font-bold py-2.5 rounded-xl transition">ตอน 3</button>
+        <button onclick="changeEpisode('ตอนที่ 4', 'https://www.youtube.com/embed/dQw4w9WgXcQ')" class="bg-gray-900 border border-gray-800 hover:bg-gray-800 text-gray-300 text-xs font-bold py-2.5 rounded-xl transition">ตอน 4</button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Script สำหรับดึง ID อนิเมะที่กดเข้ามา -->
+  <script>
+    // ดึงค่า id จาก URL เช่น watch.html?id=code_geass
+    const urlParams = new URLSearchParams(window.location.search);
+    const animeId = urlParams.get('id');
+
+    async function loadWatchData() {
+      try {
+        const response = await fetch('anime_db.json');
+        const animeData = await response.json();
+
+        // ค้นหาเรื่องที่ตรงกับ id
+        const currentAnime = animeData.find(item => item.id === animeId);
+
+        if (currentAnime) {
+          document.getElementById('animeTitle').innerText = currentAnime.title;
+          document.getElementById('animeSubTitle').innerText = currentAnime.subTitle;
+          const badge = document.getElementById('animeBadge');
+          badge.innerText = currentAnime.badge;
+          badge.className = `text-[10px] px-2.5 py-1 rounded-lg font-bold shadow ${currentAnime.badgeColor}`;
+          
+          // ตัวอย่างการเซ็ตวิดีโอเริ่มต้น
+          document.getElementById('videoPlayer').src = "https://www.youtube.com/embed/dQw4w9WgXcQ";
+        } else {
+          document.getElementById('animeTitle').innerText = "ไม่พบข้อมูลอนิเมะเรื่องนี้";
+        }
+      } catch (error) {
+        document.getElementById('animeTitle').innerText = "ไม่สามารถโหลดข้อมูลฐานข้อมูลได้";
+      }
+    }
+
+    function changeEpisode(epName, videoUrl) {
+      document.getElementById('videoPlayer').src = videoUrl;
+      // สามารถเพิ่มเอฟเฟกต์เปลี่ยนสีปุ่มตอนที่กำลังดูอยู่ได้ตรงนี้
+    }
+
+    function goBack() {
+      window.location.href = 'index.html';
+    }
+
+    loadWatchData();
+  </script>
+</body>
+</html>
