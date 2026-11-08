@@ -43,7 +43,7 @@
     </div>
     <audio id="audioPlayer" src="song1.mp3"></audio>
 
-    <!-- โลโก้และรูป fotho.png / namo.png -->
+    <!-- โลโก้และรูป -->
     <div class="text-center space-y-3 pt-2">
       <div class="relative w-full h-40 rounded-3xl overflow-hidden border border-purple-500/30 flex items-center justify-center bg-gray-900 shadow-2xl shadow-purple-950/50">
         <img src="fotho.png" alt="Background" class="absolute inset-0 w-full h-full object-cover opacity-50 filter blur-[1px]">
@@ -80,6 +80,7 @@
         <i class="fa-brands fa-tiktok mr-2 text-sm text-pink-400"></i> TikTok ช่องที่ 2 (@luxion_053)
       </a>
     </div>
+
     <!-- เครื่องมือทั้งหมด 6 รายการ -->
     <div class="space-y-3">
       <div class="flex items-center justify-between px-1">
@@ -113,9 +114,9 @@
         </a>
       </div>
     </div>
-  </div>
-
-  <!-- ==================== หน้าที่ 2: หน้าอนิเมะ ==================== -->
+  </
+    div>
+      <!-- ==================== หน้าที่ 2: หน้าอนิเมะ ==================== -->
   <div id="animeView" class="view-section max-w-md mx-auto p-4 space-y-4 hidden">
     <div id="sidebarOverlay" class="fixed inset-0 bg-black/80 backdrop-blur-md z-40 hidden transition-opacity"></div>
     <aside id="sidebar" class="fixed top-0 left-0 w-72 h-full bg-[#121218] border-r border-purple-500/20 z-50 transform -translate-x-full transition-transform duration-300 p-5 flex flex-col justify-between shadow-2xl">
@@ -131,10 +132,9 @@
           <button onclick="filterAnime('all')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-purple-600/20 text-purple-300 border border-purple-500/40 transition shadow"><i class="fa-solid fa-border-all w-5 text-purple-400"></i><span>ทั้งหมด</span></button>
           <button onclick="filterAnime('sub')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-gray-800/80 text-gray-300 transition border border-transparent"><i class="fa-solid fa-closed-captioning w-5 text-blue-400"></i><span>ซับไทย</span></button>
           <button onclick="filterAnime('dub')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-gray-800/80 text-gray-300 transition border border-transparent"><i class="fa-solid fa-microphone w-5 text-pink-400"></i><span>พากย์ไทย</span></button>
-          <button onclick="filterAnime('movie')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-gray-800/80 text-gray-300 transition border border-transparent"><i class="fa-solid fa-film w-5 text-amber-400"></i><span>เดอะมูฟวี่ (Movie)</span></button>
         </nav>
       </div>
-      <div class="text-[11px] text-gray-500 text-center border-t border-gray-800 pt-3">ANIMEMISO Streaming v2.5</div>
+      <div class="text-[11px] text-gray-500 text-center border-t border-gray-800 pt-3">ANIMEMISO Streaming v3.0</div>
     </aside>
 
     <div class="flex items-center justify-between glass-effect p-3 rounded-2xl border border-gray-800 gap-2 glow-box">
@@ -148,10 +148,11 @@
     </div>
 
     <div class="flex items-center justify-between px-1">
-      <h2 id="categoryHeader" class="text-sm font-black text-purple-300 flex items-center space-x-2"><i class="fa-solid fa-fire text-pink-500"></i><span>อนิเมะทั้งหมด</span></h2>
+      <h2 id="categoryHeader" class="text-sm font-black text-purple-300 flex items-center space-x-2"><i class="fa-solid fa-fire text-pink-500"></i><span>อนิเมะทั้งหมด (2,000 เรื่อง)</span></h2>
       <span id="statusText" class="text-[11px] bg-gray-800/80 text-gray-400 px-3 py-1 rounded-full border border-gray-700">กำลังโหลด...</span>
     </div>
 
+    <!-- กริดแสดงผลอนิเมะแบบลิงก์ตรง -->
     <div id="animeGrid" class="grid grid-cols-2 gap-3.5"></div>
   </div>
 
@@ -160,7 +161,7 @@
     <button onclick="switchTab('home')" id="navHome" class="text-purple-400 font-bold flex flex-col items-center space-y-1 transition group"><div class="p-1 rounded-xl bg-purple-600/20 text-purple-400 shadow"><i class="fa-solid fa-house text-sm"></i></div><span>หน้าแรก</span></button>
     <button onclick="switchTab('anime')" id="navAnime" class="hover:text-white flex flex-col items-center space-y-1 transition group"><div class="p-1 rounded-xl group-hover:bg-gray-800 transition"><i class="fa-solid fa-film text-sm"></i></div><span>อนิเมะ</span></button>
   </div>
-  <script>
+    <script>
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     document.getElementById('currentDate').innerText = new Date().toLocaleDateString('th-TH', options);
 
@@ -230,7 +231,7 @@
     closeBtn.onclick = closeSidebar;
     overlay.onclick = closeSidebar;
 
-    // คำสั่ง Fetch อัตโนมัติดึงข้อมูลจาก anime_db.json
+    // โหลดฐานข้อมูลจาก anime_db.json
     async function loadAnimeDatabase() {
       try {
         const response = await fetch('anime_db.json');
@@ -243,6 +244,7 @@
       }
     }
 
+    // วาดการ์ดอนิเมะแบบลิงก์ตรง
     function renderAnimeList(list) {
       grid.innerHTML = "";
       if (list.length === 0) {
@@ -251,21 +253,31 @@
       }
 
       list.forEach(item => {
-        const card = document.createElement('div');
-        card.className = "bg-[#141419] border border-gray-800/80 rounded-2xl overflow-hidden flex flex-col cursor-pointer glow-card transition duration-300 group";
+        const card = document.createElement('a');
+        card.href = item.mainUrl || '#';
+        card.target = '_blank';
+        card.rel = 'noopener noreferrer';
+        card.className = "block bg-[#141419] border border-gray-800/80 rounded-2xl p-4 glow-card transition duration-300 group relative overflow-hidden";
+        
         card.innerHTML = `
-          <div class="relative aspect-[3/4] bg-gray-900 overflow-hidden">
-            <span class="absolute top-2.5 left-2.5 z-10 ${item.badgeColor} text-white text-[10px] px-2.5 py-1 rounded-lg backdrop-blur-md font-bold shadow-md">${item.badge}</span>
-            <span class="absolute top-2.5 right-2.5 z-10 bg-black/70 text-purple-300 border border-purple-500/30 text-[10px] px-2 py-1 rounded-lg font-bold shadow">${item.epBadge}</span>
-            <img src="${item.thumb}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-            <div class="absolute inset-0 bg-gradient-to-t from-[#141419] via-transparent to-transparent opacity-80"></div>
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-[10px] px-2.5 py-1 rounded-lg font-bold shadow ${item.badgeColor || 'bg-purple-600'} text-white">
+              ${item.badge}
+            </span>
+            <span class="text-[10px] text-gray-400 bg-gray-800/80 px-2 py-0.5 rounded border border-gray-700">
+              <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i>ดูเว็บ
+            </span>
           </div>
-          <div class="p-3 flex flex-col justify-between flex-grow space-y-1.5">
-            <h3 class="text-xs font-bold text-gray-100 line-clamp-2 leading-snug group-hover:text-purple-400 transition">${item.title}</h3>
-            <p class="text-[10px] text-gray-400 line-clamp-1">${item.subTitle}</p>
+
+          <div class="h-24 rounded-xl bg-gradient-to-br from-purple-900/40 to-slate-900 border border-purple-500/20 flex items-center justify-center mb-3 group-hover:scale-[1.02] transition">
+            <i class="fa-solid fa-play text-2xl text-purple-400/80 group-hover:text-purple-300"></i>
           </div>
+
+          <h3 class="text-xs font-bold text-gray-100 line-clamp-2 leading-snug group-hover:text-purple-300 transition">
+            ${item.title}
+          </h3>
+          <p class="text-[10px] text-gray-500 mt-1">${item.subTitle}</p>
         `;
-        card.onclick = () => { window.location.href = `watch.html?id=${item.id}`; };
         grid.appendChild(card);
       });
     }
@@ -275,10 +287,9 @@
       let filtered = [];
       let label = "";
 
-      if (category === 'all') { filtered = animeData; label = "อนิเมะทั้งหมด"; }
+      if (category === 'all') { filtered = animeData; label = "อนิเมะทั้งหมด (2,000 เรื่อง)"; }
       else if (category === 'sub') { filtered = animeData.filter(a => a.type === 'sub'); label = "ซับไทย"; }
       else if (category === 'dub') { filtered = animeData.filter(a => a.type === 'dub'); label = "พากย์ไทย"; }
-      else if (category === 'movie') { filtered = animeData.filter(a => a.type === 'movie'); label = "เดอะมูฟวี่ (Movie)"; }
 
       categoryHeader.innerHTML = `<i class="fa-solid fa-fire text-pink-500"></i><span>${label}</span>`;
       statusText.innerText = `${filtered.length} เรื่อง`;
@@ -296,4 +307,5 @@
     loadAnimeDatabase();
   </script>
 </body>
-</html>
+  </html>
+  
