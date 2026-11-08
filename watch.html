@@ -33,9 +33,8 @@
   <!-- ส่วนแสดงผลหลักตอนดูอนิเมะ -->
   <main class="max-w-md mx-auto p-4 space-y-4">
     
-    <!-- กรอบวิดีโอ Player (Iframe / Video Stream) -->
+    <!-- กรอบวิดีโอ Player -->
     <div class="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border border-purple-500/30 glow-box shadow-2xl flex items-center justify-center">
-      <!-- สามารถเปลี่ยนลิงก์ src เป็นลิงก์สตรีมมิ่งหรือ Iframe ของตอนนั้นๆ ได้ -->
       <iframe id="videoPlayer" src="" class="w-full h-full border-0" allowfullscreen></iframe>
     </div>
 
@@ -55,20 +54,15 @@
         <span>เลือกตอนรับชม</span>
       </h3>
       
-      <!-- ปุ่มเลือกตอนตัวอย่าง (สามารถเพิ่มปุ่มตอนอื่นๆ ได้ที่นี่) -->
+      <!-- รายการปุ่มตอนที่จะถูกสร้างอัตโนมัติจากฐานข้อมูล -->
       <div id="episodeList" class="grid grid-cols-4 gap-2">
-        <button onclick="changeEpisode('ตอนที่ 1', 'https://www.youtube.com/embed/dQw4w9WgXcQ')" class="bg-purple-600/30 border border-purple-500/50 hover:bg-purple-600 text-purple-200 hover:text-white text-xs font-bold py-2.5 rounded-xl transition shadow">ตอน 1</button>
-        <button onclick="changeEpisode('ตอนที่ 2', 'https://www.youtube.com/embed/dQw4w9WgXcQ')" class="bg-gray-900 border border-gray-800 hover:bg-gray-800 text-gray-300 text-xs font-bold py-2.5 rounded-xl transition">ตอน 2</button>
-        <button onclick="changeEpisode('ตอนที่ 3', 'https://www.youtube.com/embed/dQw4w9WgXcQ')" class="bg-gray-900 border border-gray-800 hover:bg-gray-800 text-gray-300 text-xs font-bold py-2.5 rounded-xl transition">ตอน 3</button>
-        <button onclick="changeEpisode('ตอนที่ 4', 'https://www.youtube.com/embed/dQw4w9WgXcQ')" class="bg-gray-900 border border-gray-800 hover:bg-gray-800 text-gray-300 text-xs font-bold py-2.5 rounded-xl transition">ตอน 4</button>
+        <!-- โหลดปุ่มตอนอัตโนมัติ -->
       </div>
     </div>
 
   </main>
 
-  <!-- Script สำหรับดึง ID อนิเมะที่กดเข้ามา -->
   <script>
-    // ดึงค่า id จาก URL เช่น watch.html?id=code_geass
     const urlParams = new URLSearchParams(window.location.search);
     const animeId = urlParams.get('id');
 
@@ -77,18 +71,44 @@
         const response = await fetch('anime_db.json');
         const animeData = await response.json();
 
-        // ค้นหาเรื่องที่ตรงกับ id
         const currentAnime = animeData.find(item => item.id === animeId);
 
         if (currentAnime) {
           document.getElementById('animeTitle').innerText = currentAnime.title;
-          document.getElementById('animeSubTitle').innerText = currentAnime.subTitle;
+          document.getElementById('animeSubTitle').innerText = currentAnime.subTitle || '';
           const badge = document.getElementById('animeBadge');
-          badge.innerText = currentAnime.badge;
-          badge.className = `text-[10px] px-2.5 py-1 rounded-lg font-bold shadow ${currentAnime.badgeColor}`;
+          badge.innerText = currentAnime.badge || 'ANIMEMISO';
+          badge.className = `text-[10px] px-2.5 py-1 rounded-lg font-bold shadow ${currentAnime.badgeColor || 'bg-purple-600'} text-white`;
           
-          // ตัวอย่างการเซ็ตวิดีโอเริ่มต้น
-          document.getElementById('videoPlayer').src = "https://www.youtube.com/embed/dQw4w9WgXcQ";
+          // ตรวจสอบว่าใน JSON มีลิสต์ตอนหรือลิงก์วิดีโอไหม ถ้ามีจะดึงมาสร้างปุ่ม
+          const episodeListContainer = document.getElementById('episodeList');
+          episodeListContainer.innerHTML = '';
+
+          // สมมติถ้ามีอาเรย์ตอนในฐานข้อมูล (currentAnime.episodes)
+          if (currentAnime.episodes && currentAnime.episodes.length > 0) {
+            currentAnime.episodes.forEach((ep, index) => {
+              const btn = document.createElement('button');
+              btn.className = index === 0 
+                ? "bg-purple-600 border border-purple-500 text-white text-xs font-bold py-2.5 rounded-xl transition shadow" 
+                : "bg-gray-900 border border-gray-800 hover:bg-gray-800 text-gray-300 text-xs font-bold py-2.5 rounded-xl transition";
+              btn.innerText = ep.name || `ตอน ${index + 1}`;
+              btn.onclick = () => {
+                document.getElementById('videoPlayer').src = ep.url;
+                // สลับสีปุ่มแอคทีฟ
+                document.querySelectorAll('#episodeList button').forEach(b => {
+                  b.className = "bg-gray-900 border border-gray-800 hover:bg-gray-800 text-gray-300 text-xs font-bold py-2.5 rounded-xl transition";
+                });
+                btn.className = "bg-purple-600 border border-purple-500 text-white text-xs font-bold py-2.5 rounded-xl transition shadow";
+              };
+              episodeListContainer.appendChild(btn);
+            });
+            // เล่นตอนแรกสุดเป็นค่าเริ่มต้น
+            document.getElementById('videoPlayer').src = currentAnime.episodes[0].url;
+          } else {
+            // ถ้ายังไม่มีข้อมูลตอนแยกย่อย ให้ใช้ลิงก์หลักจากเรื่องแทน (หรือใส่ช่องว่างไว้ก่อน)
+            episodeListContainer.innerHTML = '<span class="col-span-4 text-xs text-gray-400 text-center py-2">ยังไม่มีลิงก์ตอนรับชมในระบบ</span>';
+          }
+
         } else {
           document.getElementById('animeTitle').innerText = "ไม่พบข้อมูลอนิเมะเรื่องนี้";
         }
@@ -97,16 +117,12 @@
       }
     }
 
-    function changeEpisode(epName, videoUrl) {
-      document.getElementById('videoPlayer').src = videoUrl;
-      // สามารถเพิ่มเอฟเฟกต์เปลี่ยนสีปุ่มตอนที่กำลังดูอยู่ได้ตรงนี้
-    }
-
     function goBack() {
       window.location.href = 'index.html';
     }
 
     loadWatchData();
   </script>
-</body>
+</
+  body>
 </html>
